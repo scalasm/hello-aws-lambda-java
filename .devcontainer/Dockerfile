@@ -1,6 +1,6 @@
 # See here for image contents: https://github.com/microsoft/vscode-dev-containers/blob/main/containers/java/.devcontainer/base.Dockerfile
 # [Choice] Java version (use -bullseye variants on local arm64/Apple Silicon): 8, 11, 17, 8-bullseye, 11-bullseye, 17-bullseye, 8-buster, 11-buster, 17-buster
-ARG VARIANT=11-bullseye
+ARG VARIANT=11
 FROM mcr.microsoft.com/vscode/devcontainers/java:${VARIANT}
 
 # [Option] Install Maven
@@ -15,6 +15,18 @@ RUN if [ "${INSTALL_MAVEN}" = "true" ]; then su vscode -c "umask 0002 && . /usr/
 # [Choice] Node.js version: none, lts/*, 16, 14, 12, 10
 ARG NODE_VERSION="none"
 RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"; fi
+
+# AWS CLI is already installed as remote container feature - we add AWS CDK and AWS SAM to the group
+ARG AWS_CDK_VERSION="none"
+RUN if [ "${AWS_CDK_VERSION}" != "none" ]; then su vscode -c "umask 0002 && npm install -g aws-cdk@${AWS_CDK_VERSION}"; fi
+
+ARG AWS_SAM_VERSION="none"
+RUN if [ "${AWS_SAM_VERSION}" != "none" ]; then \
+        su vscode -c "umask 0002 && curl -o /tmp/aws-sam-cli-linux-x86_64.zip -L https://github.com/aws/aws-sam-cli/releases/${AWS_SAM_VERSION}/download/aws-sam-cli-linux-x86_64.zip" \
+        && su vscode -c "umask 0002 && cd /tmp && unzip aws-sam-cli-linux-x86_64.zip -d sam-installation" \
+        && su vscode -c "umask 0002 && sudo /tmp/sam-installation/install" \
+        && su vscode -c "rm -rf /tmp/aws-sam-cli-linux-x86_64.zip sam-installation 2>&1"; \
+    fi
 
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \

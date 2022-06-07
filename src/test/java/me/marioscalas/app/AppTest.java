@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package me.marioscalas.app;
 
 import org.junit.Test;
 
