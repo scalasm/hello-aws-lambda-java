@@ -1,0 +1,16 @@
+#set($inputRoot = $input.path('$'))
+{
+  "firstName" : "$util.escapeJavaScript($inputRoot.userFirstName)",
+  "lastName" : "$util.escapeJavaScript($inputRoot.userLastName)",
+  "email" : "$util.escapeJavaScript($inputRoot.userEmail)",
+  "password" : "$util.escapeJavaScript($inputRoot.userPassword)",
+  "confirmPassword" : "$util.escapeJavaScript($inputRoot.userConfirmPassword)"
+}
+
+#set($inputRoot = $input.path('$'))
+{
+  "id" : "$util.escapeJavaScript($inputRoot.id)",
+  "firstName" : "$util.escapeJavaScript($inputRoot.firstName)",
+  "lastName" : "$util.escapeJavaScript($inputRoot.lastName)",
+  "email" : "$util.escapeJavaScript($inputRoot.email)"
+}

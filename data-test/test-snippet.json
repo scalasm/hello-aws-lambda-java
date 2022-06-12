@@ -1,0 +1,29 @@
+{
+  "firstName": "Mario",
+  "lastName": "Scalas",
+  "email": "mario.scalas@gmail.com",
+  "password": "pass1",
+  "confirmPassword": "pass1"
+}
+
+
+
+{
+    "userFirstName": "Mario",
+    "userLastName": "Scalas",
+    "userEmail": "mario.scalas@gmail.com",
+    "userPassword": "pass1",
+    "userConfirmPassword": "pass1"
+}
+
+
+
+#set($inputRoot = $input.path('$'))
+{
+  "firstName" : "$inputRoot.userFirstName",
+  "lastName" : "$inputRoot.userLastName",
+  "email" : "$inputRoot.userEmail",
+  "password" : "$inputRoot.userPassword",
+  "confirmPassword" : "$inputRoot.userConfirmPassword"
+}
+
