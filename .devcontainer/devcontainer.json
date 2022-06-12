@@ -14,8 +14,10 @@
 			"MAVEN_VERSION": "3.8.5",
 			"INSTALL_GRADLE": "false",
 			"NODE_VERSION": "lts/*",
+			// Note that we target x86_64 by default, sorry no Arm :)
 			"AWS_CDK_VERSION": "latest",
-			"AWS_SAM_VERSION": "latest"
+			"AWS_SAM_VERSION": "latest",
+			"LOCAL_DOCKER_VERSION": "20.10.17"
 		}
 	},
 	// Configure tool-specific properties.
@@ -30,7 +32,8 @@
 			"extensions": [
 				"vscjava.vscode-java-pack",
 				"GabrielBB.vscode-lombok",
-				"amazonwebservices.aws-toolkit-vscode"
+				"amazonwebservices.aws-toolkit-vscode",
+				"redhat.vscode-yaml"
 			]
 		}
 	},
@@ -45,6 +48,8 @@
 		"aws-cli": "latest"
 	},
 	"mounts": [
+		// Share the docker daemon unix socket running on the host machine
+		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind,consistency=delegated",
 		// Re-use local AWS configuration
 		"source=${localEnv:HOME}/.aws,target=/home/vscode/.aws,type=bind,consistency=cached",
 		// Re-use local Git configuration

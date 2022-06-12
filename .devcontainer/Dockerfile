@@ -28,6 +28,20 @@ RUN if [ "${AWS_SAM_VERSION}" != "none" ]; then \
         && su vscode -c "rm -rf /tmp/aws-sam-cli-linux-x86_64.zip sam-installation 2>&1"; \
     fi
 
+# We install the docker client executable in this container and, in order to make it connect to the docker daemon,
+# we also mount the socker  /var/run/docker.sock (in devcontainer.json) while ensuring that the local user ($USERNAME)
+# is also part of this new 'docker' group (on my machine the group id is 1001 and should be the same between this container
+# and the host machine)
+ARG LOCAL_DOCKER_VERSION="none"
+RUN if [ "${LOCAL_DOCKER_VERSION}" != "none" ]; then \
+        su vscode -c "umask 0002 && curl -o /tmp/docker-bundle.tgz -L https://download.docker.com/linux/static/stable/x86_64/docker-${LOCAL_DOCKER_VERSION}.tgz" \
+        && su vscode -c "umask 0002 && cd /tmp && tar xzf docker-bundle.tgz" \
+        && su vscode -c "umask 0002 && sudo mv /tmp/docker/docker /usr/local/bin" \
+        && su vscode -c "rm -rf /tmp/docker 2>&1" \
+        && su vscode -c "sudo groupadd docker -g 1001" \
+        && su vscode -c "sudo usermod -a -G docker vscode"; \
+    fi
+
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 #     && apt-get -y install --no-install-recommends <your-package-list-here>

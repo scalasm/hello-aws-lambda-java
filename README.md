@@ -1,4 +1,4 @@
-# Pet project for AWS Lambda Function
+# Demo project for building serverless REST APIs using AWS Lambda
 
 This a sample project using Visual Studio Code remote containers for building and deploying AWS Lambda functions written in Java.
 
