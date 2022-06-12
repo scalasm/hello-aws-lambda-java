@@ -17,11 +17,11 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
-          working-directory: 'CreateUserFunction'
           distribution: 'corretto'
           java-version: '11'
           check-latest: false
           cache: 'maven'
       - name: Build with Maven
+        working-directory: 'CreateUserFunction'
         run: 'mvn package'
         shell: bash
