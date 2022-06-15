@@ -1,22 +1,17 @@
+// User creation request payload
 {
-  "firstName": "Mario",
-  "lastName": "Scalas",
-  "email": "mario.scalas@gmail.com",
-  "password": "pass1",
-  "confirmPassword": "pass1"
+  "firstName": "John",
+  "lastName": "Smith",
+  "email": "your.name@gmail.com",
+  "password": "Kapel2ineri5.",
+  "confirmPassword": "Kapel2ineri5."
 }
 
-
-
+// User confirm request payload
 {
-    "userFirstName": "Mario",
-    "userLastName": "Scalas",
-    "userEmail": "mario.scalas@gmail.com",
-    "userPassword": "pass1",
-    "userConfirmPassword": "pass1"
+    "email": "your.name@gmail.com",
+    "confirmationCode": "023802"
 }
-
-
 
 #set($inputRoot = $input.path('$'))
 {

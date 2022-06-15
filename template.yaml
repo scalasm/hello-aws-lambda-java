@@ -15,22 +15,33 @@ Globals:
     MemorySize: 512
     Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
       Variables:
-        PARAM1: VALUE
+        COGNITO_APP_CLIENT_ID: AQICAHgLSAt/g06jBk+yLOMnD5ki7cbCcNo+KJXEeO7DA5F6BAHMRcVfkG5mhYWWWsowxCm6AAAAeDB2BgkqhkiG9w0BBwagaTBnAgEAMGIGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQM9SksmI5N/7zlN0j4AgEQgDVfaovJFa3HAnt9fGSRZuaPTJFG4Hx3ayZV60z2ipMkofpHxo8aNxzUmgyEFhEEpwRf/SAAkQ==
+        COGNITO_APP_CLIENT_SECRET: AQICAHgLSAt/g06jBk+yLOMnD5ki7cbCcNo+KJXEeO7DA5F6BAHFp7GZ8U0YOPgcE9lgtBOSAAAAlDCBkQYJKoZIhvcNAQcGoIGDMIGAAgEAMHsGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMREVw1DJ6+z2l75X9AgEQgE6RPAAQBuUCUeskbnZZFPluIwP2tjouveQS4f0Z7/H/YmBy5Fm4mPVhS7BhWeiTLJKnXCO7MhdT3Rn3BavwWpbjZc3FiEso/v7jVL3bLtE=
         JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 # More info about tiered compilation https://aws.amazon.com/blogs/compute/optimizing-aws-lambda-function-performance-for-java/
 
 Resources:
   CreateUserFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: CreateUserFunction
+      CodeUri: UserApiFunctions
       Handler: me.marioscalas.app.port.CreateUserHandler::handleRequest
-
       Events:
         CreateUser:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /users
             Method: post
+  ConfirmUserFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: UserApiFunctions
+      Handler: me.marioscalas.app.port.ConfirmUserHandler::handleRequest
+      Events:
+        ConfirmUser:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /users-confirm
+            Method: post            
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
@@ -42,5 +53,11 @@ Outputs:
     Description: "Create User Function ARN"
     Value: !GetAtt CreateUserFunction.Arn
   CreateUserFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt CreateUserFunction.Arn
+    Description: "Implicit IAM Role created for Create User function"
+    Value: !GetAtt CreateUserFunctionRole.Arn
+  ConfirmUserFunction:
+    Description: "Confirm User Sign-Up Function ARN"
+    Value: !GetAtt ConfirmUserFunction.Arn
+  ConfirmUserFunctionIamRole:
+    Description: "Implicit IAM Role created for Confirm User Sign-Up function"
+    Value: !GetAtt ConfirmUserFunctionRole.Arn

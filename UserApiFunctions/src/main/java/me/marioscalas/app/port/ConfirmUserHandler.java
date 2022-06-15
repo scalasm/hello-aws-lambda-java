@@ -9,14 +9,14 @@ import com.google.gson.Gson;
 
 import me.marioscalas.app.adapter.CognitoConfig;
 import me.marioscalas.app.adapter.CognitoUserService;
-import me.marioscalas.app.core.service.CreateUserRequest;
-import me.marioscalas.app.core.service.CreateUserResponse;
+import me.marioscalas.app.core.service.ConfirmUserSignUpRequest;
+import me.marioscalas.app.core.service.ConfirmUserSignUpResponse;
 import me.marioscalas.app.core.service.UserService;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 
 
 
-public class CreateUserHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+public class ConfirmUserHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     // Static Initialization here 
 
     /**
@@ -32,30 +32,38 @@ public class CreateUserHandler implements RequestHandler<APIGatewayProxyRequestE
 
         logger.log("Using lambda function v" + context.getFunctionVersion());
 
-        final CreateUserRequest request = GSON.fromJson(
-            input.getBody(),    
-            CreateUserRequest.class
-        );
-
         final APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
-
         try {
-            final CreateUserResponse createUserResponse = userService.createUser(request);
+            final ConfirmUserSignUpRequest request = GSON.fromJson(
+                input.getBody(),    
+                ConfirmUserSignUpRequest.class
+            );
+
+            final ConfirmUserSignUpResponse confirmUserSignUpResponse = userService.confirmUserSignUp(request);
 
             response.setStatusCode(200);
             response.setBody(
-                GSON.toJson(createUserResponse)
+                GSON.toJson(confirmUserSignUpResponse)
             );
         } catch (AwsServiceException e) {
-            logger.log("Error: " + e.getMessage());
+            logger.log("AWS SDK Error: " + e.getMessage());
 
-            response.setStatusCode(500);
+            response.setStatusCode(e.awsErrorDetails().sdkHttpResponse().statusCode());
             response.setBody(
                 GSON.toJson(
                     new ErrorResponse(
                         e.awsErrorDetails().errorMessage(),
                         null
                     )
+                )
+            );
+        } catch (Exception e) {
+            logger.log("Whops!: " + e.getMessage());
+
+            response.setStatusCode(500);
+            response.setBody(
+                GSON.toJson(
+                    ErrorResponse.fromException(e)
                 )
             );
         }
@@ -65,8 +73,8 @@ public class CreateUserHandler implements RequestHandler<APIGatewayProxyRequestE
 
     private static UserService getUserService() {
         final CognitoConfig config = new CognitoConfig(
-            System.getenv("COGNITO_APP_CLIENT_ID"), 
-            System.getenv("COGNITO_APP_CLIENT_SECRET"), 
+            Utils.getenv("COGNITO_APP_CLIENT_ID"), 
+            Utils.getenv("COGNITO_APP_CLIENT_SECRET"), 
             System.getenv("AWS_REGION")
         );
         

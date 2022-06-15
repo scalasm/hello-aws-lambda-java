@@ -7,11 +7,15 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.amazonaws.util.Base64;
 
+import me.marioscalas.app.core.service.ConfirmUserSignUpRequest;
+import me.marioscalas.app.core.service.ConfirmUserSignUpResponse;
 import me.marioscalas.app.core.service.CreateUserRequest;
 import me.marioscalas.app.core.service.CreateUserResponse;
 import me.marioscalas.app.core.service.UserService;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ConfirmSignUpRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ConfirmSignUpResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpResponse;
 
@@ -68,6 +72,29 @@ public class CognitoUserService implements UserService {
             .statusCode(signUp.sdkHttpResponse().statusCode())
             .cognitoUserId(signUp.userSub())
             .isConfirmed(signUp.userConfirmed())
+            .build();
+    }
+
+    @Override
+    public ConfirmUserSignUpResponse confirmUserSignUp(ConfirmUserSignUpRequest request) {
+        final String generatedSecretHash = calculateSecretHash(
+            cognitoConfig.getAppClientId(), 
+            cognitoConfig.getAppClientSecret(), 
+            request.getEmail()
+        );
+
+        final ConfirmSignUpRequest confirmSignUpRequest = ConfirmSignUpRequest.builder()
+            .secretHash(generatedSecretHash)
+            .username(request.getEmail())
+            .confirmationCode(request.getConfirmationCode())
+            .clientId(cognitoConfig.getAppClientId())
+            .build();
+
+        final ConfirmSignUpResponse confirmSignUpResponse = cognitoIdentityProviderClient.confirmSignUp(confirmSignUpRequest);
+
+        return ConfirmUserSignUpResponse.builder()
+            .isSuccessful(confirmSignUpResponse.sdkHttpResponse().isSuccessful())
+            .statusCode(confirmSignUpResponse.sdkHttpResponse().statusCode())
             .build();
     }
 
