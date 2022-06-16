@@ -4,24 +4,24 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 
-import me.marioscalas.app.core.service.CreateUserRequest;
-import me.marioscalas.app.core.service.CreateUserResponse;
+import me.marioscalas.app.core.service.LoginUserRequest;
+import me.marioscalas.app.core.service.LoginUserResponse;
 
 
+public class LoginUserHandler extends AbstractLambdaHandler {
 
-public class CreateUserHandler extends AbstractLambdaHandler {
     @Override
     protected void onAPIGatewayProxyRequestEvent(APIGatewayProxyRequestEvent input, APIGatewayProxyResponseEvent response, Context context) {
-        final CreateUserRequest request = GSON.fromJson(
+        final LoginUserRequest request = GSON.fromJson(
             input.getBody(),    
-            CreateUserRequest.class
+            LoginUserRequest.class
         );
 
-        final CreateUserResponse createUserResponse = userService.createUser(request);
+        final LoginUserResponse loginUserResponse = userService.loginUser(request);
 
         response.setStatusCode(200);
         response.setBody(
-            GSON.toJson(createUserResponse)
+            GSON.toJson(loginUserResponse)
         );
     }
 }
