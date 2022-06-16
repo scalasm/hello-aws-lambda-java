@@ -1,6 +1,7 @@
 package me.marioscalas.app.adapter;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.UUID;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -11,13 +12,18 @@ import me.marioscalas.app.core.service.ConfirmUserSignUpRequest;
 import me.marioscalas.app.core.service.ConfirmUserSignUpResponse;
 import me.marioscalas.app.core.service.CreateUserRequest;
 import me.marioscalas.app.core.service.CreateUserResponse;
+import me.marioscalas.app.core.service.LoginUserRequest;
+import me.marioscalas.app.core.service.LoginUserResponse;
 import me.marioscalas.app.core.service.UserService;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ConfirmSignUpRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ConfirmSignUpResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpResponse;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.InitiateAuthRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.InitiateAuthResponse;
 
 public class CognitoUserService implements UserService {
 
@@ -95,6 +101,37 @@ public class CognitoUserService implements UserService {
         return ConfirmUserSignUpResponse.builder()
             .isSuccessful(confirmSignUpResponse.sdkHttpResponse().isSuccessful())
             .statusCode(confirmSignUpResponse.sdkHttpResponse().statusCode())
+            .build();
+    }
+
+    @Override
+    public LoginUserResponse loginUser(LoginUserRequest request) {
+        final String generatedSecretHash = calculateSecretHash(
+            cognitoConfig.getAppClientId(), 
+            cognitoConfig.getAppClientSecret(), 
+            request.getEmail()
+        );
+
+        final Map<String,String> authParameters = Map.of(
+            "USERNAME", request.getEmail(), 
+            "PASSWORD", request.getPassword(), 
+            "SECRET_HASH", generatedSecretHash
+        );
+        
+        final InitiateAuthRequest authRequest = InitiateAuthRequest.builder()
+            .clientId(cognitoConfig.getAppClientId())
+            .authFlow(AuthFlowType.USER_PASSWORD_AUTH)
+            .authParameters(authParameters)
+            .build();
+
+        final InitiateAuthResponse authResponse = cognitoIdentityProviderClient.initiateAuth(authRequest);
+
+        return LoginUserResponse.builder()
+            .idToken(authResponse.authenticationResult().idToken())
+            .accessToken(authResponse.authenticationResult().accessToken())
+            .refreshToken(authResponse.authenticationResult().refreshToken())
+            .isSuccessful(authResponse.sdkHttpResponse().isSuccessful())
+            .statusCode(authResponse.sdkHttpResponse().statusCode())
             .build();
     }
 

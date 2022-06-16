@@ -42,6 +42,18 @@ Resources:
           Properties:
             Path: /users-confirm
             Method: post            
+
+  LoginUserFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: UserApiFunctions
+      Handler: me.marioscalas.app.port.LoginUserHandler::handleRequest
+      Events:
+        ConfirmUser:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /login
+            Method: post        
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
@@ -61,3 +73,9 @@ Outputs:
   ConfirmUserFunctionIamRole:
     Description: "Implicit IAM Role created for Confirm User Sign-Up function"
     Value: !GetAtt ConfirmUserFunctionRole.Arn
+  LoginUserFunction:
+    Description: "Login User Function ARN"
+    Value: !GetAtt LoginUserFunction.Arn
+  LoginUserFunctionIamRole:
+    Description: "Implicit IAM Role created for Login User function"
+    Value: !GetAtt LoginUserFunctionRole.Arn
