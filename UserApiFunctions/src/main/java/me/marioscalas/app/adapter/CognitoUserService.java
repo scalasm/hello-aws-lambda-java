@@ -8,6 +8,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.amazonaws.util.Base64;
 
+import me.marioscalas.app.core.service.AddUserToGroupRequest;
+import me.marioscalas.app.core.service.AddUserToGroupResponse;
 import me.marioscalas.app.core.service.ConfirmUserSignUpRequest;
 import me.marioscalas.app.core.service.ConfirmUserSignUpResponse;
 import me.marioscalas.app.core.service.CreateUserRequest;
@@ -16,6 +18,8 @@ import me.marioscalas.app.core.service.LoginUserRequest;
 import me.marioscalas.app.core.service.LoginUserResponse;
 import me.marioscalas.app.core.service.UserService;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminAddUserToGroupRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminAddUserToGroupResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ConfirmSignUpRequest;
@@ -132,6 +136,23 @@ public class CognitoUserService implements UserService {
             .refreshToken(authResponse.authenticationResult().refreshToken())
             .isSuccessful(authResponse.sdkHttpResponse().isSuccessful())
             .statusCode(authResponse.sdkHttpResponse().statusCode())
+            .build();
+    }
+
+    @Override
+    public AddUserToGroupResponse addUserToGroup(AddUserToGroupRequest request) {
+        final AdminAddUserToGroupRequest adminAddUserToGroupRequest = AdminAddUserToGroupRequest.builder()
+            .groupName(request.getGroupName())
+            .username(request.getUserName())
+            .userPoolId(cognitoConfig.getUserPoolId())
+            .build();
+
+        final AdminAddUserToGroupResponse adminAddUserToGroupResponse = 
+            cognitoIdentityProviderClient.adminAddUserToGroup(adminAddUserToGroupRequest);
+
+        return AddUserToGroupResponse.builder()
+            .isSuccessful(adminAddUserToGroupResponse.sdkHttpResponse().isSuccessful())
+            .statusCode(adminAddUserToGroupResponse.sdkHttpResponse().statusCode())
             .build();
     }
 
