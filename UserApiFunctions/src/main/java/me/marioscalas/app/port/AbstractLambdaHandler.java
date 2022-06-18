@@ -76,10 +76,6 @@ public abstract class AbstractLambdaHandler implements RequestHandler<APIGateway
         final String userPoolId = Utils.getenv("COGNITO_USER_POOL_ID");
         final String region = System.getenv("AWS_REGION");
 
-        System.out.println("appClientId == " + appClientId);
-        System.out.println("appClientSecret == " + appClientSecret);
-        System.out.println("region == " + region);
-
         final CognitoConfig config = new CognitoConfig(
             appClientId, appClientSecret, userPoolId, region
         );
