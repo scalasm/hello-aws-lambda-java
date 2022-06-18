@@ -5,4 +5,5 @@ public interface UserService {
     ConfirmUserSignUpResponse confirmUserSignUp(ConfirmUserSignUpRequest request);
     LoginUserResponse loginUser(LoginUserRequest request);
     AddUserToGroupResponse addUserToGroup(AddUserToGroupRequest request);
+    MyGetUserResponse getUser(MyGetUserRequest request);
 }
