@@ -10,7 +10,9 @@ public class CognitoConfig {
 
     private final String appClientId;
 
-    private final String appClientSecret;    
+    private final String appClientSecret;  
+    
+    private final String userPoolId;
 
     private final String region;    
 

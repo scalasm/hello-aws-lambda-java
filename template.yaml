@@ -17,6 +17,7 @@ Globals:
       Variables:
         COGNITO_APP_CLIENT_ID: AQICAHgLSAt/g06jBk+yLOMnD5ki7cbCcNo+KJXEeO7DA5F6BAHMRcVfkG5mhYWWWsowxCm6AAAAeDB2BgkqhkiG9w0BBwagaTBnAgEAMGIGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQM9SksmI5N/7zlN0j4AgEQgDVfaovJFa3HAnt9fGSRZuaPTJFG4Hx3ayZV60z2ipMkofpHxo8aNxzUmgyEFhEEpwRf/SAAkQ==
         COGNITO_APP_CLIENT_SECRET: AQICAHgLSAt/g06jBk+yLOMnD5ki7cbCcNo+KJXEeO7DA5F6BAHFp7GZ8U0YOPgcE9lgtBOSAAAAlDCBkQYJKoZIhvcNAQcGoIGDMIGAAgEAMHsGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMREVw1DJ6+z2l75X9AgEQgE6RPAAQBuUCUeskbnZZFPluIwP2tjouveQS4f0Z7/H/YmBy5Fm4mPVhS7BhWeiTLJKnXCO7MhdT3Rn3BavwWpbjZc3FiEso/v7jVL3bLtE=
+        COGNITO_USER_POOL_ID: AQICAHgLSAt/g06jBk+yLOMnD5ki7cbCcNo+KJXEeO7DA5F6BAG/xJ/0Kr4bU5epCBshKAxNAAAAcTBvBgkqhkiG9w0BBwagYjBgAgEAMFsGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMojyvh8I+UfzDuSc+AgEQgC7ZwMaNZK1MplL5q1N6d7vRR3GJrNU8sWJqkArxQCcX9gRbMLcIUx9p+CCW2DMI
         JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 # More info about tiered compilation https://aws.amazon.com/blogs/compute/optimizing-aws-lambda-function-performance-for-java/
 
 Resources:
@@ -53,7 +54,26 @@ Resources:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /login
-            Method: post        
+            Method: post
+  AddUseToGroupUserFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: UserApiFunctions
+      Handler: me.marioscalas.app.port.AddUserToGroupHandler::handleRequest
+      Events:
+        ConfirmUser:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /groups/{groupName}/add-user
+            Method: post
+      Policies: 
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - "cognito-idp:AdminAddUserToGroup"
+              Resource: "arn:aws:cognito-idp:eu-west-1:959713430052:userpool/eu-west-1_gnUM2CYnk"
+
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
@@ -79,3 +99,9 @@ Outputs:
   LoginUserFunctionIamRole:
     Description: "Implicit IAM Role created for Login User function"
     Value: !GetAtt LoginUserFunctionRole.Arn
+  AddUseToGroupUserFunction:
+    Description: "Add User to Group Function ARN"
+    Value: !GetAtt AddUseToGroupUserFunction.Arn
+  AddUseToGroupUserFunctionIamRole:
+    Description: "Implicit IAM Role created for Add User to Group function"
+    Value: !GetAtt AddUseToGroupUserFunctionRole.Arn

@@ -71,10 +71,17 @@ public abstract class AbstractLambdaHandler implements RequestHandler<APIGateway
     protected abstract void onAPIGatewayProxyRequestEvent(APIGatewayProxyRequestEvent input, APIGatewayProxyResponseEvent response, Context context);
 
     private static UserService getUserService() {
+        final String appClientId = Utils.getenv("COGNITO_APP_CLIENT_ID");
+        final String appClientSecret = Utils.getenv("COGNITO_APP_CLIENT_SECRET");
+        final String userPoolId = Utils.getenv("COGNITO_USER_POOL_ID");
+        final String region = System.getenv("AWS_REGION");
+
+        System.out.println("appClientId == " + appClientId);
+        System.out.println("appClientSecret == " + appClientSecret);
+        System.out.println("region == " + region);
+
         final CognitoConfig config = new CognitoConfig(
-            Utils.getenv("COGNITO_APP_CLIENT_ID"), 
-            Utils.getenv("COGNITO_APP_CLIENT_SECRET"), 
-            System.getenv("AWS_REGION")
+            appClientId, appClientSecret, userPoolId, region
         );
         
         return new CognitoUserService(config);
