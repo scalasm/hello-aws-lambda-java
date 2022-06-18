@@ -7,6 +7,13 @@
   "confirmPassword": "Kapel2ineri5."
 }
 
+// login
+{
+  "email": "your.name@gmail.com",
+  "password": "Kapel2ineri5."
+}
+
+
 // User confirm request payload
 {
     "email": "your.name@gmail.com",

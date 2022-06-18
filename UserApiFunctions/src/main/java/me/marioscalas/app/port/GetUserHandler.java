@@ -1,41 +1,32 @@
 package me.marioscalas.app.port;
 
-import java.util.Map;
-
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
-import com.google.gson.Gson;
 
-import lombok.RequiredArgsConstructor;
+import me.marioscalas.app.core.service.MyGetUserRequest;
+import me.marioscalas.app.core.service.MyGetUserResponse;
 
-@RequiredArgsConstructor
-class User {
-    final String userId;
-    final String firstName;
-    final String lastName;
-}
-
-
-public class GetUserHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
-    // Static Initialization here 
-    private static Gson GSON = new Gson();
-
-
+public class GetUserHandler extends AbstractLambdaHandler {
     @Override
-    public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent input, Context context) {
-        final Map<String, String> pathParameters = input.getPathParameters();
-        final String userId = pathParameters.get("userId");
+    protected void onAPIGatewayProxyRequestEvent(APIGatewayProxyRequestEvent input, APIGatewayProxyResponseEvent response, Context context) {
+        // Case is not preserved - I must use lowercase name even if I pass "AccessToken"    
+        final String accessToken = input.getHeaders().get("accesstoken");
 
-        final User stubUser = new User(userId, "Mario", "Scalas");    
+        final LambdaLogger logger = context.getLogger();
+        logger.log("Access token == " + accessToken);
+        logger.log("All headers == " + input.getHeaders());
 
-        final String bodyAsJson = GSON.toJson(stubUser);
+        final MyGetUserRequest request = MyGetUserRequest.builder()
+            .accessToken(accessToken)
+            .build();
 
-        final APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
+        final MyGetUserResponse createUserResponse = userService.getUser(request);
+
         response.setStatusCode(200);
-        response.setBody(bodyAsJson);
-
-        return response;
+        response.setBody(
+            GSON.toJson(createUserResponse)
+        );
     }
 }

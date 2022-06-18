@@ -1,0 +1,78 @@
+openapi: "3.0.1"
+info:
+  title: "photo-app-rest-api-sam"
+  version: "1.0"
+servers:
+- url: "https://kaegldw74c.execute-api.eu-west-1.amazonaws.com/{basePath}"
+  variables:
+    basePath:
+      default: "/Prod"
+paths:
+  /users:
+    post:
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:959713430052:function:photo-app-rest-api-sam-CreateUserFunction-cTQ3skK2Tyci/invocations"
+        passthroughBehavior: "when_no_match"
+  /login:
+    post:
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:959713430052:function:photo-app-rest-api-sam-LoginUserFunction-KGMmDOdRz8aJ/invocations"
+        passthroughBehavior: "when_no_match"
+  /users/me:
+    get:
+      parameters:
+      - name: "AccessToken"
+        in: "header"
+        required: true
+        schema:
+          type: "string"
+      security:
+      - PhotoApp-Cognito-Authorizer: []
+      x-amazon-apigateway-request-validator: "Validate query string parameters and\
+        \ headers"
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:959713430052:function:photo-app-rest-api-sam-GetUserFunction-fDxG3V2zTRQ8/invocations"
+        passthroughBehavior: "when_no_match"
+  /users-confirm:
+    post:
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:959713430052:function:photo-app-rest-api-sam-ConfirmUserFunction-qpOcGvUda7zQ/invocations"
+        passthroughBehavior: "when_no_match"
+  /groups/{groupName}/add-user:
+    post:
+      parameters:
+      - name: "groupName"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      security:
+      - PhotoApp-Cognito-Authorizer: []
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:959713430052:function:photo-app-rest-api-sam-AddUserToGroupFunction-29X7Kig3Z4EG/invocations"
+        passthroughBehavior: "when_no_match"
+components:
+  securitySchemes:
+    PhotoApp-Cognito-Authorizer:
+      type: "apiKey"
+      name: "Authorization"
+      in: "header"
+      x-amazon-apigateway-authtype: "cognito_user_pools"
+      x-amazon-apigateway-authorizer:
+        type: "cognito_user_pools"
+        providerARNs:
+        - "arn:aws:cognito-idp:eu-west-1:959713430052:userpool/eu-west-1_gnUM2CYnk"
+x-amazon-apigateway-request-validators:
+  Validate query string parameters and headers:
+    validateRequestParameters: true
+    validateRequestBody: false

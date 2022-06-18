@@ -21,6 +21,15 @@ Globals:
         JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 # More info about tiered compilation https://aws.amazon.com/blogs/compute/optimizing-aws-lambda-function-performance-for-java/
 
 Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: openapi.yaml 
   CreateUserFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -32,6 +41,8 @@ Resources:
           Properties:
             Path: /users
             Method: post
+            RestApiId:
+              Ref: MyApi
   ConfirmUserFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -43,19 +54,22 @@ Resources:
           Properties:
             Path: /users-confirm
             Method: post            
-
+            RestApiId:
+              Ref: MyApi
   LoginUserFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: UserApiFunctions
       Handler: me.marioscalas.app.port.LoginUserHandler::handleRequest
       Events:
-        ConfirmUser:
+        LoginUser:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /login
             Method: post
-  AddUseToGroupUserFunction:
+            RestApiId:
+              Ref: MyApi
+  AddUserToGroupFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: UserApiFunctions
@@ -66,6 +80,8 @@ Resources:
           Properties:
             Path: /groups/{groupName}/add-user
             Method: post
+            RestApiId:
+              Ref: MyApi
       Policies: 
         - Version: "2012-10-17"
           Statement:
@@ -73,6 +89,19 @@ Resources:
               Action:
                 - "cognito-idp:AdminAddUserToGroup"
               Resource: "arn:aws:cognito-idp:eu-west-1:959713430052:userpool/eu-west-1_gnUM2CYnk"
+  GetUserFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: UserApiFunctions
+      Handler: me.marioscalas.app.port.GetUserHandler::handleRequest
+      Events:
+        GetUser:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /users/me
+            Method: get
+            RestApiId:
+              Ref: MyApi
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
@@ -80,7 +109,7 @@ Outputs:
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   PhotoAppUsersApi:
     Description: "API endpoint for creating new users."
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/users/"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/users/"
   CreateUserFunction:
     Description: "Create User Function ARN"
     Value: !GetAtt CreateUserFunction.Arn
@@ -99,9 +128,15 @@ Outputs:
   LoginUserFunctionIamRole:
     Description: "Implicit IAM Role created for Login User function"
     Value: !GetAtt LoginUserFunctionRole.Arn
-  AddUseToGroupUserFunction:
+  AddUserToGroupFunction:
     Description: "Add User to Group Function ARN"
-    Value: !GetAtt AddUseToGroupUserFunction.Arn
-  AddUseToGroupUserFunctionIamRole:
-    Description: "Implicit IAM Role created for Add User to Group function"
-    Value: !GetAtt AddUseToGroupUserFunctionRole.Arn
+    Value: !GetAtt AddUserToGroupFunction.Arn
+  AddUserToGroupFunctionIamRole:
+    Description: "Implicit IAM Role created for Get User to Group function"
+    Value: !GetAtt AddUserToGroupFunctionRole.Arn
+  GetUserFunction:
+    Description: "Get User Function ARN"
+    Value: !GetAtt GetUserFunction.Arn
+  GetUserFunctionIamRole:
+    Description: "Implicit IAM Role created for Get User function"
+    Value: !GetAtt GetUserFunctionRole.Arn
