@@ -26,7 +26,8 @@
 		"vscode": {
 			// Set *default* container specific settings.json values on container create.
 			"settings": {
-				"maven.executable.path": "/usr/local/sdkman/candidates/maven/current/bin/mvn"
+				"maven.executable.path": "/usr/local/sdkman/candidates/maven/current/bin/mvn",
+				"telemetry.enableTelemetry": false
 			},
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
@@ -36,6 +37,9 @@
 				"redhat.vscode-yaml"
 			]
 		}
+	},
+	"containerEnv": {
+		"SAM_CLI_TELEMETRY": "0"
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
