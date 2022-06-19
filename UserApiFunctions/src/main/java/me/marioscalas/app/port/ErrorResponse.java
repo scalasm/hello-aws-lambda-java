@@ -9,13 +9,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor @Getter
 public class ErrorResponse {
     public static ErrorResponse fromException(final Exception e) {
+        return new ErrorResponse(
+            e.getMessage(), getStackTraceAsString(e)
+        );
+    }
+
+    public static String getStackTraceAsString(Exception e) {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
 
-        return new ErrorResponse(
-            e.getMessage(), sw.toString()
-        );
+        return sw.toString();
     }
 
     private final String errorMessage;

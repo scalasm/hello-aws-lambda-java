@@ -28,7 +28,15 @@ public abstract class AbstractLambdaHandler implements RequestHandler<APIGateway
     /**
      * Shared user service instance
      */
-    protected static final UserService userService = getUserService();
+    protected final UserService userService;
+
+    protected AbstractLambdaHandler(UserService userService) {
+        this.userService = userService;
+    }
+
+    protected AbstractLambdaHandler() {
+        this.userService = getUserService();
+    }
 
     @Override
     public final APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent input, Context context) {
@@ -50,7 +58,7 @@ public abstract class AbstractLambdaHandler implements RequestHandler<APIGateway
                 GSON.toJson(
                     new ErrorResponse(
                         e.awsErrorDetails().errorMessage(),
-                        null
+                        ErrorResponse.getStackTraceAsString(e)
                     )
                 )
             );
