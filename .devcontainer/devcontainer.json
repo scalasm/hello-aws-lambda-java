@@ -34,7 +34,8 @@
 				"vscjava.vscode-java-pack",
 				"GabrielBB.vscode-lombok",
 				"amazonwebservices.aws-toolkit-vscode",
-				"redhat.vscode-yaml"
+				"redhat.vscode-yaml",
+				"redhat.fabric8-analytics"
 			]
 		}
 	},
@@ -44,7 +45,7 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "java -version",
+	"postCreateCommand": "bash ./.devcontainer/post-install.sh",
 	// Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode",
 	"features": {
