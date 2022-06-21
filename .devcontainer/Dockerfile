@@ -43,8 +43,11 @@ RUN if [ "${LOCAL_DOCKER_VERSION}" != "none" ]; then \
     fi
 
 # [Optional] Uncomment this section to install additional OS packages.
-# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+     && apt-get -y install --no-install-recommends python3-pip
+
+# Required for access to AWS CodeCommit repositories using codecommit://<profile>@<repo-name> syntax
+RUN su vscode -c "sudo pip install git-remote-codecommit"
 
 # [Optional] Uncomment this line to install global node packages.
 # RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
