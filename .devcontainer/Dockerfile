@@ -36,10 +36,17 @@ ARG LOCAL_DOCKER_VERSION="none"
 RUN if [ "${LOCAL_DOCKER_VERSION}" != "none" ]; then \
         su vscode -c "umask 0002 && curl -o /tmp/docker-bundle.tgz -L https://download.docker.com/linux/static/stable/x86_64/docker-${LOCAL_DOCKER_VERSION}.tgz" \
         && su vscode -c "umask 0002 && cd /tmp && tar xzf docker-bundle.tgz" \
-        && su vscode -c "umask 0002 && sudo mv /tmp/docker/docker /usr/local/bin" \
+        && su vscode -c "umask 0002 && sudo chown root:root /tmp/docker/docker && sudo mv /tmp/docker/docker /usr/local/bin" \
         && su vscode -c "rm -rf /tmp/docker 2>&1" \
         && su vscode -c "sudo groupadd docker -g 1001" \
         && su vscode -c "sudo usermod -a -G docker vscode"; \
+    fi
+
+ARG LOCAL_DOCKER_COMPOSE_VERSION="none"
+RUN if [ "${LOCAL_DOCKER_COMPOSE_VERSION}" != "none" ]; then \
+        su vscode -c "umask 0002 && curl -L https://github.com/docker/compose/releases/download/v${LOCAL_DOCKER_COMPOSE_VERSION}/docker-compose-linux-x86_64 -o /tmp/docker-compose" \
+        && su vscode -c "umask 0002 && sudo chmod +x /tmp/docker-compose && sudo chown root:root /tmp/docker-compose" \
+        && su vscode -c "umask 0002 && sudo mv /tmp/docker-compose /usr/local/bin"; \
     fi
 
 # [Optional] Uncomment this section to install additional OS packages.

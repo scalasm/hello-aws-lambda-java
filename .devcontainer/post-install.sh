@@ -18,10 +18,16 @@ WORKSPACE_DIR=$(pwd)
 
 # Change some Poetry settings to better deal with working in a container
 java --version
-aws --version
-cdk --version
+
 node --version
 npm --version
+
 python3 --version
+
+aws --version
+cdk --version
+
+docker --version 
+docker-compose --version 
 
 echo "Done!"

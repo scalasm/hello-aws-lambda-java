@@ -17,7 +17,8 @@
 			// Note that we target x86_64 by default, sorry no Arm :)
 			"AWS_CDK_VERSION": "latest",
 			"AWS_SAM_VERSION": "latest",
-			"LOCAL_DOCKER_VERSION": "20.10.17"
+			"LOCAL_DOCKER_VERSION": "20.10.17",
+			"LOCAL_DOCKER_COMPOSE_VERSION": "2.6.0"
 		}
 	},
 	// Configure tool-specific properties.
